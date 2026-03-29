@@ -12,7 +12,22 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+
+        // 1. Добавление в глобальный список (раньше $middleware)
+        $middleware->append(\App\Http\Middleware\LogMiddleware::class);
+
+        // 2. Настройка групп (web или api)
+        $middleware->web(append: [
+            \App\Http\Middleware\LogMiddleware::class,
+        ]);
+
+        // 3. Регистрация Алиасов (раньше $routeMiddleware)
+        $middleware->alias([
+            'log' => \App\Http\Middleware\LogMiddleware::class,
+            'active' => \App\Http\Middleware\ActiveMiddleware::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'token' => \App\Http\Middleware\TokenMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
